@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bb_menu_surprise_me"
+        android:icon="@drawable/ic_favorites"
+        android:title="Surprise Me" />
+    <item
+        android:id="@+id/bb_menu_super_heroes"
+        android:icon="@drawable/ic_friends"
+        android:title="My Super Hero" />
+
+</menu>

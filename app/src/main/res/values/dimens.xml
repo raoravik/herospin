@@ -1,0 +1,14 @@
+<resources>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="floating_margin_right">50dp</dimen>
+    <dimen name="design_fab_size_normal">56dp</dimen>
+    <dimen name="cardsize">26dp</dimen>
+    <dimen name="character_title">20dp</dimen>
+    <dimen name="super_hero_row_height">200dp</dimen>
+    <dimen name="super_hero_row_gradient_height">60dp</dimen>
+</resources>

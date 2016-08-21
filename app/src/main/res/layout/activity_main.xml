@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/real_bg"
+    tools:context=".activity.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/card0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/cardsize"
+            android:text="Welcome, Visa HeroSpin is a fun little app"/>
+
+        <TextView android:id="@+id/card1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/cardsize"
+            android:text="HeroSpin will randomly suggest a Marvel Super Hero movie from IMDB.
+            Just select 'Surprise Me' button. Every time you press, it will recommend a surprise pick for you."/>
+
+        <TextView android:id="@+id/card2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/cardsize"
+            android:text="Alternately, you can select your favourite super hero and we will recommend a movie for that superhero."/>
+
+        <!--<ImageView-->
+            <!--android:id="@+id/card0"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:paddingTop="20dp"-->
+            <!--android:paddingBottom="10dp"-->
+            <!--android:visibility="invisible"-->
+            <!--android:src="@drawable/card0"/>-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/card1"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="invisible"-->
+            <!--android:src="@drawable/card1"/>-->
+
+
+        <!--<ImageView-->
+            <!--android:id="@+id/card2"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="invisible"-->
+            <!--android:src="@drawable/card2"/>-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/card3"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="invisible"-->
+            <!--android:src="@drawable/card3"/>-->
+    </LinearLayout>
+
+    <com.visa.r4r.poc.herospin.customview.BezierView
+        android:id="@+id/bezier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.visa.r4r.poc.herospin.customview.FloatingActionButton
+        android:id="@+id/floating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="50dp"
+        android:text="Explore"
+        android:textSize = "16sp"
+        android:visibility="invisible"
+        />
+
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--android:src="@android:drawable/ic_media_play"-->
+        <!--app:layout_anchor="@id/app_bar"-->
+        <!--app:layout_anchorGravity="bottom|end" />-->
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container">
+    </FrameLayout>
+
+</android.support.design.widget.CoordinatorLayout>
