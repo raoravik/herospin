@@ -38,6 +38,7 @@ import com.visa.r4r.poc.herospin.tmdb.model.Movie;
 import com.visa.r4r.poc.herospin.tmdb.model.MoviesResponse;
 import com.visa.r4r.poc.herospin.tmdb.rest.TmdbApiClient;
 import com.visa.r4r.poc.herospin.tmdb.rest.TmdbInterface;
+import com.visa.r4r.poc.herospin.utils.AsyncTaskResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,6 +76,19 @@ public class MovieFragment extends BaseFragment {
     private ImageView movieHeaderImage;
     private RelativeLayout step1Layout;
     private RelativeLayout step2Layout;
+
+    private View.OnClickListener onClickListener =  new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (snackbar!=null) {
+                snackbar.dismiss();
+            }
+            snackbar = Snackbar.make(view, "Finding a movie for you...", Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction("Action", null).show();
+            introLayout.setVisibility(View.GONE);
+            new GetRandomMovie().execute();
+        }
+    };
 
     public MovieFragment() {
         // Required empty public constructor
@@ -117,17 +131,6 @@ public class MovieFragment extends BaseFragment {
         movieHeaderImage = (ImageView) fragmentView.findViewById(R.id.movieHeaderImage);
         step1Layout = (RelativeLayout) fragmentView.findViewById(R.id.step1Layout);
         step2Layout = (RelativeLayout) fragmentView.findViewById(R.id.step2Layout);
-        View fabRandomMovie = fragmentView.findViewById(R.id.fabRandomMovie);
-        View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                snackbar = Snackbar.make(view, "Finding a movie for you...", Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAction("Action", null).show();
-                introLayout.setVisibility(View.GONE);
-                new GetRandomMovie().execute();
-            }
-        };
-        fabRandomMovie.setOnClickListener(onClickListener);
         step1Layout.setOnClickListener(onClickListener);
         step2Layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +138,8 @@ public class MovieFragment extends BaseFragment {
                 mListener.onFragmentInteraction(1);
             }
         });
+        View fabRandomMovie = fragmentView.findViewById(R.id.fabRandomMovie);
+        fabRandomMovie.setOnClickListener(onClickListener);
 
         return fragmentView;
     }
@@ -170,10 +175,10 @@ public class MovieFragment extends BaseFragment {
         void onFragmentInteraction(int action);
     }
 
-    class GetRandomMovie extends AsyncTask<String,Long,List<Movie>> {
+    class GetRandomMovie extends AsyncTask<String,Long,AsyncTaskResult<List<Movie>>> {
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected AsyncTaskResult<List<Movie>> doInBackground(String... params) {
             if(cachedMovieList.size()<10) {
                 TmdbInterface apiService =
                         TmdbApiClient.getClient().create(TmdbInterface.class);
@@ -184,24 +189,39 @@ public class MovieFragment extends BaseFragment {
                     Log.d("MovieAPI", "Response returned: " + response.isSuccessful());
                     cachedMovieList.addAll(response.body().getResults());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    return new AsyncTaskResult<>(e);
                 }
             }
-            return cachedMovieList;
+            return new AsyncTaskResult<>(cachedMovieList);
         }
 
         @Override
-        protected void onPostExecute(List<Movie> movies) {
-            if(movies==null || movies.size()==0){
+        protected void onPostExecute(AsyncTaskResult<List<Movie>> asyncTaskResult) {
+            List<Movie> movies;
+            if ( asyncTaskResult.getError() != null ) {
+                // error handling here
                 snackbar.dismiss();
-                snackbar = Snackbar.make(getView(), "Oops. Something went wrong. No movies found... ", Snackbar.LENGTH_LONG);
-                snackbar.setAction("Action", null).show();
+                snackbar = Snackbar.make(getView(), "Oops. Error getting data:"+asyncTaskResult.getError().getMessage(), Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction("Retry", onClickListener).show();
+            }  else if ( isCancelled()) {
+                // cancel handling here
+                snackbar.dismiss();
+                snackbar = Snackbar.make(getView(), "The Movie DB API Query cancelled.", Snackbar.LENGTH_SHORT);
+                snackbar.setAction("Retry", onClickListener).show();
             } else {
-                Log.d("MovieAPI","Number of movies: "+movies.size());
-                snackbar.dismiss();
-                int random = new Random().nextInt(movies.size());
-                displayMovie(movies.remove(random));
+                movies = asyncTaskResult.getResult();
+                if(movies==null || movies.size()==0){
+                    snackbar.dismiss();
+                    snackbar = Snackbar.make(getView(), "No movies found... ", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Action", null).show();
+                } else {
+                    Log.d("MovieAPI","Number of movies: "+movies.size());
+                    snackbar.dismiss();
+                    int random = new Random().nextInt(movies.size());
+                    displayMovie(movies.remove(random));
+                }
             }
+
         }
     }
 
