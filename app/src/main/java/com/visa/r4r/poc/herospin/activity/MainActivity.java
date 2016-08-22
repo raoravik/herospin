@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         List<Fragment> fragments = new ArrayList<>(2);
 
         fragments.add(MovieFragment.newInstance("",""));
-        fragments.add(CharacterFragment.newInstance(0));
+        fragments.add(CharacterFragment.newInstance(2));
         fragNavController =
                 new FragNavController(getSupportFragmentManager(), R.id.container, fragments);
 

@@ -19,9 +19,13 @@ package com.visa.r4r.poc.herospin.fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +38,7 @@ import com.visa.r4r.poc.herospin.marvel.rest.CharacterApiClient;
 import com.visa.r4r.poc.herospin.marvel.rest.MarvelApiConfig;
 import com.visa.r4r.poc.herospin.marvel.rest.MarvelApiException;
 import com.visa.r4r.poc.herospin.marvel.utils.Constants;
+import com.visa.r4r.poc.herospin.utils.AsyncTaskResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +58,18 @@ public class CharacterFragment extends BaseFragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
+    private Snackbar snackbar;
+    private View.OnClickListener onClickListener =  new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (snackbar!=null) {
+                snackbar.dismiss();
+            }
+            snackbar = Snackbar.make(view, "Loading Marvel Characters...", Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction("Action", null).show();
+            new GetAllCharactersTask().execute();
+        }
+    };
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -84,18 +101,16 @@ public class CharacterFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_character_list, container, false);
-
+        recyclerView = (RecyclerView) view.findViewById(R.id.list);
         // Set the adapter
-        if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                recyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, OrientationHelper.VERTICAL));
             }
-            new GetAllCharactersTask().execute();
-        }
+        snackbar = Snackbar.make(view, "Loading Marvel Characters...", Snackbar.LENGTH_INDEFINITE);
+        new GetAllCharactersTask().execute();
         return view;
     }
 
@@ -132,10 +147,10 @@ public class CharacterFragment extends BaseFragment {
         void onListFragmentInteraction(Character character);
     }
 
-    class GetAllCharactersTask extends AsyncTask<Void,Long,List<Character>> {
+    class GetAllCharactersTask extends AsyncTask<Void,Long,AsyncTaskResult<List<Character>>> {
 
         @Override
-        protected List<Character> doInBackground(Void... params) {
+        protected AsyncTaskResult<List<Character>> doInBackground(Void... params) {
             MarvelApiConfig marvelApiConfig =
                     new MarvelApiConfig.Builder(Constants.MARVEL_PUBLIC_KEY, Constants.MARVEL_PRIVATE_KEY).debug().build();
             CharacterApiClient characterApiClient = new CharacterApiClient(marvelApiConfig);
@@ -143,19 +158,35 @@ public class CharacterFragment extends BaseFragment {
             try {
                 charactersMarvelResponse = characterApiClient.getAll(0, 100);
             } catch (MarvelApiException e) {
-                e.printStackTrace();
+                return new AsyncTaskResult<>(e);
             }
-
-            if (charactersMarvelResponse != null) {
-                return charactersMarvelResponse.getResponse().getCharacters();
-            } else {
-                return new ArrayList<>();
-            }
+            return new AsyncTaskResult<>(charactersMarvelResponse.getResponse().getCharacters());
         }
 
         @Override
-        protected void onPostExecute(List<Character> characters) {
-            recyclerView.setAdapter(new CharacterRecyclerViewAdapter(characters, mListener));
+        protected void onPostExecute(AsyncTaskResult<List<Character>> asyncTaskResult) {
+            if ( asyncTaskResult.getError() != null ) {
+                // error handling here
+                snackbar.dismiss();
+                snackbar = Snackbar.make(getView(), "Oops. Error getting data from Marvel:"+asyncTaskResult.getError().getMessage(), Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction("Retry", onClickListener).show();
+            }  else if ( isCancelled()) {
+                // cancel handling here
+                snackbar.dismiss();
+                snackbar = Snackbar.make(getView(), "Marvel API Query cancelled.", Snackbar.LENGTH_SHORT);
+                snackbar.setAction("Retry", onClickListener).show();
+            } else {
+                List<Character> characters = asyncTaskResult.getResult();
+                if(characters==null || characters.size()==0){
+                    snackbar.dismiss();
+                    snackbar = Snackbar.make(getView(), "No Marvel Characters found... ", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Action", null).show();
+                } else {
+                    Log.d("MovieAPI","Number of characters: "+characters.size());
+                    snackbar.dismiss();
+                    recyclerView.setAdapter(new CharacterRecyclerViewAdapter(characters, mListener));
+                }
+            }
         }
     }
 
