@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public void onFragmentInteraction(int action) {
+        fragNavController.switchTab(action);
     }
 }

@@ -27,10 +27,10 @@ import retrofit2.http.Query;
  * Created by ravrarao on 8/21/2016.
  */
 public interface TmdbInterface {
-    @GET("/keyword/{id}/movies")
+    @GET("keyword/{id}/movies")
     Call<MoviesResponse> getMoviesByKeyword(@Path("id") String keywordId, @Query("api_key") String apiKey);
 
-    @GET("/keyword/8828-marvel-comic/movies")
+    @GET("keyword/8828-marvel-comic/movies")
     Call<MoviesResponse> getMarvelComicMovies(@Query("api_key") String apiKey);
 
     @GET("movie/{id}")

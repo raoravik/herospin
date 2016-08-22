@@ -18,13 +18,35 @@ package com.visa.r4r.poc.herospin.fragment;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.visa.r4r.poc.herospin.R;
+import com.visa.r4r.poc.herospin.marvel.utils.Constants;
+import com.visa.r4r.poc.herospin.tmdb.model.Movie;
+import com.visa.r4r.poc.herospin.tmdb.model.MoviesResponse;
+import com.visa.r4r.poc.herospin.tmdb.rest.TmdbApiClient;
+import com.visa.r4r.poc.herospin.tmdb.rest.TmdbInterface;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,11 +62,19 @@ public class MovieFragment extends BaseFragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
+    private List<Movie> cachedMovieList= new ArrayList<>();
+
+
     private OnFragmentInteractionListener mListener;
+    private Snackbar snackbar;
+    private LinearLayout introLayout;
+    private LinearLayout movieDetailsLayout;
+    private ImageView movieHeaderImage;
+    private RelativeLayout step1Layout;
+    private RelativeLayout step2Layout;
 
     public MovieFragment() {
         // Required empty public constructor
@@ -81,14 +111,32 @@ public class MovieFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_movie, container, false);
-    }
+        View fragmentView = inflater.inflate(R.layout.fragment_movie, container, false);
+        introLayout = (LinearLayout) fragmentView.findViewById(R.id.introLayout);
+        movieDetailsLayout = (LinearLayout) fragmentView.findViewById(R.id.movieDetailsLayout);
+        movieHeaderImage = (ImageView) fragmentView.findViewById(R.id.movieHeaderImage);
+        step1Layout = (RelativeLayout) fragmentView.findViewById(R.id.step1Layout);
+        step2Layout = (RelativeLayout) fragmentView.findViewById(R.id.step2Layout);
+        View fabRandomMovie = fragmentView.findViewById(R.id.fabRandomMovie);
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                snackbar = Snackbar.make(view, "Finding a movie for you...", Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction("Action", null).show();
+                introLayout.setVisibility(View.GONE);
+                new GetRandomMovie().execute();
+            }
+        };
+        fabRandomMovie.setOnClickListener(onClickListener);
+        step1Layout.setOnClickListener(onClickListener);
+        step2Layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onFragmentInteraction(1);
+            }
+        });
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        return fragmentView;
     }
 
     @Override
@@ -119,7 +167,55 @@ public class MovieFragment extends BaseFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(int action);
+    }
+
+    class GetRandomMovie extends AsyncTask<String,Long,List<Movie>> {
+
+        @Override
+        protected List<Movie> doInBackground(String... params) {
+            if(cachedMovieList.size()<10) {
+                TmdbInterface apiService =
+                        TmdbApiClient.getClient().create(TmdbInterface.class);
+
+                Call<MoviesResponse> call = apiService.getMarvelComicMovies(Constants.TMDB_API_KEY);
+                try {
+                    Response<MoviesResponse> response = call.execute();
+                    Log.d("MovieAPI", "Response returned: " + response.isSuccessful());
+                    cachedMovieList.addAll(response.body().getResults());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return cachedMovieList;
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+            if(movies==null || movies.size()==0){
+                snackbar.dismiss();
+                snackbar = Snackbar.make(getView(), "Oops. Something went wrong. No movies found... ", Snackbar.LENGTH_LONG);
+                snackbar.setAction("Action", null).show();
+            } else {
+                Log.d("MovieAPI","Number of movies: "+movies.size());
+                snackbar.dismiss();
+                int random = new Random().nextInt(movies.size());
+                displayMovie(movies.remove(random));
+            }
+        }
+    }
+
+    private void displayMovie(Movie movie) {
+        introLayout.setVisibility(View.GONE);
+        movieDetailsLayout.setVisibility(View.VISIBLE);
+        Picasso.with(getContext()).load(Constants.TMDB_BASE_IMAGE_URL+movie.getPosterPath()).fit().centerCrop().into(movieHeaderImage);
+        TextView tvTitle = (TextView) movieDetailsLayout.findViewById(R.id.tvTitle);
+        tvTitle.setText(movie.getTitle());
+        TextView tvYear = (TextView) movieDetailsLayout.findViewById(R.id.tvYear);
+        tvYear.setText(movie.getReleaseDate());
+        TextView tvOverview = (TextView) movieDetailsLayout.findViewById(R.id.tvOverview);
+        tvOverview.setText(movie.getOverview());
+        TextView tvRating = (TextView) movieDetailsLayout.findViewById(R.id.tvRating);
+        tvRating.setText(String.valueOf(movie.getVoteAverage()));
     }
 }
