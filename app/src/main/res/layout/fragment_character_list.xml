@@ -28,6 +28,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
-        tools:context="com.visa.r4r.poc.herospin.fragment.CharacterFragment"
+        tools:context=".fragment.CharacterListFragment"
         tools:listitem="@layout/fragment_character" />
 </android.support.design.widget.CoordinatorLayout>

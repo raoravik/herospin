@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.visa.r4r.poc.herospin.R;
-import com.visa.r4r.poc.herospin.fragment.CharacterFragment.OnListFragmentInteractionListener;
+import com.visa.r4r.poc.herospin.fragment.CharacterListFragment.OnListFragmentInteractionListener;
 import com.visa.r4r.poc.herospin.marvel.model.Character;
 import com.visa.r4r.poc.herospin.marvel.model.MarvelImage;
 

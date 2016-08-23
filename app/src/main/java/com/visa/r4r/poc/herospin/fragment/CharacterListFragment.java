@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -40,7 +39,6 @@ import com.visa.r4r.poc.herospin.marvel.rest.MarvelApiException;
 import com.visa.r4r.poc.herospin.marvel.utils.Constants;
 import com.visa.r4r.poc.herospin.utils.AsyncTaskResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +47,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class CharacterFragment extends BaseFragment {
+public class CharacterListFragment extends BaseFragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -75,13 +73,13 @@ public class CharacterFragment extends BaseFragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public CharacterFragment() {
+    public CharacterListFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static CharacterFragment newInstance(int columnCount) {
-        CharacterFragment fragment = new CharacterFragment();
+    public static CharacterListFragment newInstance(int columnCount) {
+        CharacterListFragment fragment = new CharacterListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
