@@ -34,6 +34,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
+            app:title="Visa Hero Spin"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
