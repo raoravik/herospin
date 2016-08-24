@@ -20,6 +20,20 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <io.saeid.fabloading.LoadingView
+        android:id="@+id/loading_view_long"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:scaleX="2"
+        android:scaleY="2"
+        app:mfl_onclickLoading="false"
+        android:layout_marginBottom="40dp"
+        app:mfl_duration="200"
+        app:mfl_repeat="100"
+    />
+
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"

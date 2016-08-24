@@ -17,7 +17,9 @@
 package com.visa.r4r.poc.herospin.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +42,8 @@ import com.visa.r4r.poc.herospin.marvel.utils.Constants;
 import com.visa.r4r.poc.herospin.utils.AsyncTaskResult;
 
 import java.util.List;
+
+import io.saeid.fabloading.LoadingView;
 
 /**
  * A fragment representing a list of Items.
@@ -68,6 +72,7 @@ public class CharacterListFragment extends BaseFragment {
             new GetAllCharactersTask().execute();
         }
     };
+    private LoadingView mLoadViewLong;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -99,6 +104,21 @@ public class CharacterListFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_character_list, container, false);
+
+        mLoadViewLong = (LoadingView) view.findViewById(R.id.loading_view_long);
+        boolean isLollipop = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        int marvel_1 = isLollipop ? R.drawable.marvel_1_lollipop : R.drawable.marvel_1;
+        int marvel_2 = isLollipop ? R.drawable.marvel_2_lollipop : R.drawable.marvel_2;
+        int marvel_3 = isLollipop ? R.drawable.marvel_3_lollipop : R.drawable.marvel_3;
+        int marvel_4 = isLollipop ? R.drawable.marvel_4_lollipop : R.drawable.marvel_4;
+
+        mLoadViewLong.addAnimation(Color.parseColor("#2F5DA9"), marvel_2, LoadingView.FROM_LEFT);
+        mLoadViewLong.addAnimation(Color.parseColor("#FF4218"), marvel_3, LoadingView.FROM_TOP);
+        mLoadViewLong.addAnimation(Color.parseColor("#FFD200"), marvel_1, LoadingView.FROM_RIGHT);
+        mLoadViewLong.addAnimation(Color.parseColor("#C7E7FB"), marvel_4, LoadingView.FROM_BOTTOM);
+        mLoadViewLong.startAnimation();
+
+
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         // Set the adapter
             Context context = view.getContext();
@@ -182,6 +202,7 @@ public class CharacterListFragment extends BaseFragment {
                 } else {
                     Log.d("MovieAPI","Number of characters: "+characters.size());
                     snackbar.dismiss();
+                    mLoadViewLong.setVisibility(View.GONE);
                     recyclerView.setAdapter(new CharacterRecyclerViewAdapter(characters, mListener));
                 }
             }
