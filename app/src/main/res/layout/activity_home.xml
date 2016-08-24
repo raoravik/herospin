@@ -4,21 +4,61 @@ xmlns:tools="http://schemas.android.com/tools"
 android:id="@+id/homeCoordinatorLayout"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-android:fitsSystemWindows="true"
-tools:context=".activity.CharacterDetailsActivity">
+    android:background="@drawable/real_bg"
+    tools:context=".activity.IntroActivity">
 
-<android.support.v4.widget.NestedScrollView
-    android:id="@+id/homeScrollingContent"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-    <!-- Your loooong scrolling content here -->
+        <ImageView
+        android:id="@+id/card0"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+            android:scaleType="fitXY"
+            android:visibility="invisible"
+        android:src="@drawable/visavengers"/>
 
-    <WebView  android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        <ImageView
+        android:id="@+id/card1"
+        android:layout_width="wrap_content"
+        android:layout_height="135dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:visibility="invisible"
+        android:src="@drawable/step1"/>
 
-    </WebView>
-</android.support.v4.widget.NestedScrollView>
+
+        <ImageView
+        android:id="@+id/card2"
+        android:layout_width="wrap_content"
+        android:layout_height="135dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+        android:visibility="invisible"
+        android:src="@drawable/step2"/>
+
+    </LinearLayout>
+
+    <com.visa.r4r.poc.herospin.customview.BezierView
+        android:id="@+id/bezier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.visa.r4r.poc.herospin.customview.FloatingActionButton
+        android:id="@+id/floating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="50dp"
+        android:text="Explore"
+        android:textSize = "16sp"
+        android:visibility="invisible"
+        />
 
 </android.support.design.widget.CoordinatorLayout>
