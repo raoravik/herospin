@@ -22,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jmleiva.pagedrecyclerview.PagedRecyclerViewAdapter;
 import com.visa.r4r.poc.herospin.R;
 import com.visa.r4r.poc.herospin.marvel.model.Character;
 import com.visa.r4r.poc.herospin.marvel.model.Characters;
@@ -41,6 +43,7 @@ import com.visa.r4r.poc.herospin.marvel.rest.MarvelApiException;
 import com.visa.r4r.poc.herospin.marvel.utils.Constants;
 import com.visa.r4r.poc.herospin.utils.AsyncTaskResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.saeid.fabloading.LoadingView;
@@ -51,12 +54,15 @@ import io.saeid.fabloading.LoadingView;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class CharacterListFragment extends BaseFragment {
+public class CharacterListFragment extends BaseFragment implements PagedRecyclerViewAdapter.Paginator {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String TAG = "CharactersList";
-    // TODO: Customize parameters
+
+    private long totalCount=1;
+    private int currentCount=0;
+    private int pageSize=10;
+
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
@@ -73,6 +79,7 @@ public class CharacterListFragment extends BaseFragment {
         }
     };
     private LoadingView mLoadViewLong;
+    private CharacterRecyclerViewAdapter characterRecyclerViewAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -120,13 +127,20 @@ public class CharacterListFragment extends BaseFragment {
 
 
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
-        // Set the adapter
             Context context = view.getContext();
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, OrientationHelper.VERTICAL));
+                recyclerView.setLayoutManager(new GridLayoutManager(context,mColumnCount));
             }
+        characterRecyclerViewAdapter = new CharacterRecyclerViewAdapter(new ArrayList<Character>(), mListener);
+        characterRecyclerViewAdapter.setPaginator(CharacterListFragment.this);
+        recyclerView.setAdapter(characterRecyclerViewAdapter);
+
+        //Reset Pagination Data
+        currentCount=0;
+        totalCount=1;
+
         snackbar = Snackbar.make(view, "Loading Marvel Characters...", Snackbar.LENGTH_INDEFINITE);
         new GetAllCharactersTask().execute();
         return view;
@@ -165,6 +179,16 @@ public class CharacterListFragment extends BaseFragment {
         void onListFragmentInteraction(Character character);
     }
 
+    @Override
+    public void loadNewPage() {
+        new GetAllCharactersTask().execute();
+    }
+
+    @Override
+    public boolean hasMoreData() {
+        return currentCount<totalCount;
+    }
+
     class GetAllCharactersTask extends AsyncTask<Void,Long,AsyncTaskResult<List<Character>>> {
 
         @Override
@@ -173,12 +197,16 @@ public class CharacterListFragment extends BaseFragment {
                     new MarvelApiConfig.Builder(Constants.MARVEL_PUBLIC_KEY, Constants.MARVEL_PRIVATE_KEY).debug().build();
             CharacterApiClient characterApiClient = new CharacterApiClient(marvelApiConfig);
             MarvelResponse<Characters> charactersMarvelResponse = null;
+            List<Character> characterList;
             try {
-                charactersMarvelResponse = characterApiClient.getAll(0, 100);
+                charactersMarvelResponse = characterApiClient.getAll(currentCount, pageSize);
+                totalCount=charactersMarvelResponse.getResponse().getTotal();
+                currentCount+=charactersMarvelResponse.getResponse().getCount();
+                characterList = charactersMarvelResponse.getResponse().getCharacters();
             } catch (MarvelApiException e) {
                 return new AsyncTaskResult<>(e);
             }
-            return new AsyncTaskResult<>(charactersMarvelResponse.getResponse().getCharacters());
+            return new AsyncTaskResult<>(characterList);
         }
 
         @Override
@@ -203,9 +231,10 @@ public class CharacterListFragment extends BaseFragment {
                     Log.d("MovieAPI","Number of characters: "+characters.size());
                     snackbar.dismiss();
                     mLoadViewLong.setVisibility(View.GONE);
-                    recyclerView.setAdapter(new CharacterRecyclerViewAdapter(characters, mListener));
+                    characterRecyclerViewAdapter.addData(characters);
                 }
             }
+            characterRecyclerViewAdapter.stopLoading();
         }
     }
 
