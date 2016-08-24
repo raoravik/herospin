@@ -3,7 +3,7 @@ This is a fun little app to randomly suggest super hero movies based on marvel c
 
 
 **Intro Screen**
-![Intro Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/1.png =100x)
+<img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/1.png" width="100"/>
 
 **Main Screen**
 ![Main Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/2.png =250x)
