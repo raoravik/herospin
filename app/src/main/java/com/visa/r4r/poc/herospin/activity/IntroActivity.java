@@ -19,6 +19,8 @@ package com.visa.r4r.poc.herospin.activity;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -27,6 +29,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.visa.r4r.poc.herospin.R;
@@ -61,12 +64,12 @@ public class IntroActivity extends AppCompatActivity {
     FloatingActionButton mFloatingActionButton;
 
     @BindViews({R.id.card0, R.id.card1, R.id.card2})
-    List<TextView> cards;
+    List<ImageView> cards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
@@ -80,7 +83,9 @@ public class IntroActivity extends AppCompatActivity {
 
                 enter();
 
-                IntroActivity.this.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    IntroActivity.this.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
             }
         });
     }
@@ -90,8 +95,22 @@ public class IntroActivity extends AppCompatActivity {
         if (index == 1) {
             exit();
             index++;
-        }
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(IntroActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
 
+                }
+            }, BEZIER_EXIT_DURATION + BezierView.ANIMATION_DURATION + 100);
+
+        }
     }
 
 
@@ -151,7 +170,7 @@ public class IntroActivity extends AppCompatActivity {
 
     public void cardEnter() {
         int delay = 100;
-        for (final TextView card : cards) {
+        for (final ImageView card : cards) {
             Animator animator = ObjectAnimator.ofFloat(card, "translationX", screenWidth - card.getLeft(), 0f);
             animator.setDuration(550);
             animator.setStartDelay(BezierView.ANIMATION_DURATION + delay * cards.indexOf(card));
@@ -167,7 +186,7 @@ public class IntroActivity extends AppCompatActivity {
 
     public void cardExit() {
         int delay = 50;
-        for (final TextView card : cards) {
+        for (final ImageView card : cards) {
             Animator animator = ObjectAnimator.ofFloat(card, "translationY", 0, -(card.getY() + card.getMeasuredHeight()));
             animator.setDuration(300 + 150 * cards.indexOf(card));
             animator.setStartDelay(delay * cards.indexOf(card));
