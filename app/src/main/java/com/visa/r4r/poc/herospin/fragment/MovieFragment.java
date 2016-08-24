@@ -67,6 +67,9 @@ public class MovieFragment extends BaseFragment {
     private String mParam2;
 
     private List<Movie> cachedMovieList= new ArrayList<>();
+    private int currentPage=1;
+    private int totalPages=1;
+
 
 
     private OnFragmentInteractionListener mListener;
@@ -180,14 +183,20 @@ public class MovieFragment extends BaseFragment {
         @Override
         protected AsyncTaskResult<List<Movie>> doInBackground(String... params) {
             if(cachedMovieList.size()<10) {
+                //If Finished through all pages, reset to page 1.
+                if(currentPage>totalPages ){
+                    currentPage=1;
+                }
                 TmdbInterface apiService =
                         TmdbApiClient.getClient().create(TmdbInterface.class);
 
-                Call<MoviesResponse> call = apiService.getMarvelComicMovies(Constants.TMDB_API_KEY);
+                Call<MoviesResponse> call = apiService.getMarvelComicMovies(Constants.TMDB_API_KEY,currentPage);
                 try {
                     Response<MoviesResponse> response = call.execute();
                     Log.d("MovieAPI", "Response returned: " + response.isSuccessful());
                     cachedMovieList.addAll(response.body().getResults());
+                    totalPages = response.body().getTotalPages();
+                    currentPage++;
                 } catch (IOException e) {
                     return new AsyncTaskResult<>(e);
                 }
