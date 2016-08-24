@@ -7,7 +7,7 @@
 
 
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_visa_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"

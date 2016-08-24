@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jmleiva.pagedrecyclerview.PagedRecyclerViewAdapter;
+import com.jmleiva.pagedrecyclerview.PagedViewHolder;
 import com.squareup.picasso.Picasso;
 import com.visa.r4r.poc.herospin.R;
 import com.visa.r4r.poc.herospin.fragment.CharacterListFragment.OnListFragmentInteractionListener;
@@ -36,7 +38,7 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class CharacterRecyclerViewAdapter extends RecyclerView.Adapter<CharacterRecyclerViewAdapter.ViewHolder> {
+public class CharacterRecyclerViewAdapter extends PagedRecyclerViewAdapter<CharacterRecyclerViewAdapter.ViewHolder,PagedViewHolder> {
 
     private final List<Character> mValues;
     private final OnListFragmentInteractionListener mListener;
@@ -46,15 +48,30 @@ public class CharacterRecyclerViewAdapter extends RecyclerView.Adapter<Character
         mListener = listener;
     }
 
+    public void addData(List<Character> moreData) {
+        mValues.addAll(moreData);
+    }
+
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_character, parent, false);
+    protected int getPagedItemCount() {
+        return mValues.size();
+    }
+
+    @Override
+    protected ViewHolder onCreateNormalViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_character, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    protected PagedViewHolder onCreateLoadingViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.basic_loading_layout, parent, false);
+        return new PagedViewHolder(view);
+
+    }
+
+    @Override
+    protected void onBindNormalViewHolder(final ViewHolder holder, int position) {
         Character character = mValues.get(position);
         holder.mItem = character;
         holder.nameTextView.setText(character.getName());
@@ -74,11 +91,16 @@ public class CharacterRecyclerViewAdapter extends RecyclerView.Adapter<Character
     }
 
     @Override
-    public int getItemCount() {
-        return mValues.size();
+    protected void onBindLoadingViewHolder(PagedViewHolder holder) {
+
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    //    @Override
+//    public int getItemCount() {
+//        return mValues.size();
+//    }
+
+    public class ViewHolder extends PagedViewHolder {
         public final View mView;
         public final ImageView photoImageView;
         public final TextView nameTextView;
