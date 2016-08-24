@@ -33,6 +33,7 @@ import com.visa.r4r.poc.herospin.R;
 import com.visa.r4r.poc.herospin.fragment.BaseFragment;
 import com.visa.r4r.poc.herospin.fragment.CharacterDetailsFragment;
 import com.visa.r4r.poc.herospin.fragment.CharacterListFragment;
+import com.visa.r4r.poc.herospin.fragment.CharacterMovieFragment;
 import com.visa.r4r.poc.herospin.fragment.MovieFragment;
 import com.visa.r4r.poc.herospin.marvel.model.Character;
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         ,CharacterListFragment.OnListFragmentInteractionListener
         ,CharacterDetailsFragment.OnFragmentInteractionListener
         ,MovieFragment.OnFragmentInteractionListener
+        ,CharacterMovieFragment.OnFragmentInteractionListener
 {
     private BottomBar bottomBar;
     private FragNavController fragNavController;
@@ -159,8 +161,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     @Override
     public void onFragmentInteraction(String characterName) {
         //Handle Character Details Fragment Action.
-        fragNavController.switchTab(INDEX_SURPRISE_ME);
         Log.d("CHARACTERMOVIE","Loading character specific movie screen");
-        fragNavController.push(MovieFragment.newInstance(characterName,null));
+        fragNavController.push(CharacterMovieFragment.newInstance(characterName));
     }
 }
