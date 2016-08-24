@@ -3,22 +3,22 @@ This is a fun little app to randomly suggest super hero movies based on marvel c
 
 
 **Intro Screen**
-![Intro Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/1.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/1.png" width="250"/>
 
 **Main Screen**
-![Main Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/2.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/2.png" width="250"/>
 
 **Random Movie Screen**
-![Random Movie Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/3.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/3.png" width="250"/>
 
-![Random Movie Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/4.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/4.png" width="250"/>
 
 **Character Listing Screen**
-![Character Listing Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/5.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/5.png" width="250"/>
 
 **Character Specific Movie Suggestions Screen**
-![Character Listing Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/6.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/6.png" width="250"/>
 
-![Character Listing Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/7.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/7.png" width="250"/>
 
-![Character Listing Screen](https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/8.png)
+<br><img src="https://raw.githubusercontent.com/raoravik/herospin/develop/screenshots/8.png" width="250"/>
