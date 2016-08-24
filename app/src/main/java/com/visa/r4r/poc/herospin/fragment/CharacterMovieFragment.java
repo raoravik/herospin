@@ -17,9 +17,9 @@
 package com.visa.r4r.poc.herospin.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -46,25 +46,21 @@ import java.util.List;
 import java.util.Random;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MovieFragment.OnFragmentInteractionListener} interface
+ * {@link CharacterMovieFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MovieFragment#newInstance} factory method to
+ * Use the {@link CharacterMovieFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MovieFragment extends BaseFragment {
-    // TODO: Rename parameter arguments, choose names that match
+public class CharacterMovieFragment extends BaseFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "characterName";
 
-    private String mParam1;
-    private String mParam2;
+    private String characterName;
 
     private List<Movie> cachedMovieList= new ArrayList<>();
     private int currentPage=1;
@@ -77,8 +73,6 @@ public class MovieFragment extends BaseFragment {
     private LinearLayout introLayout;
     private LinearLayout movieDetailsLayout;
     private ImageView movieHeaderImage;
-    private RelativeLayout step1Layout;
-    private RelativeLayout step2Layout;
 
     private View.OnClickListener onClickListener =  new View.OnClickListener() {
         @Override
@@ -86,14 +80,14 @@ public class MovieFragment extends BaseFragment {
             if (snackbar!=null) {
                 snackbar.dismiss();
             }
-            snackbar = Snackbar.make(view, "Finding a movie for you...", Snackbar.LENGTH_INDEFINITE);
+            snackbar = Snackbar.make(view, "Finding a "+characterName+" movie for you...", Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction("Action", null).show();
             introLayout.setVisibility(View.GONE);
-            new GetRandomMovie().execute();
+            new GetCharacterSpecificMovie().execute(characterName);
         }
     };
 
-    public MovieFragment() {
+    public CharacterMovieFragment() {
         // Required empty public constructor
     }
 
@@ -101,16 +95,14 @@ public class MovieFragment extends BaseFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param characterName Parameter 1.
      * @return A new instance of fragment MovieFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MovieFragment newInstance(String param1, String param2) {
-        MovieFragment fragment = new MovieFragment();
+    public static CharacterMovieFragment newInstance(String characterName) {
+        CharacterMovieFragment fragment = new CharacterMovieFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, characterName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -119,8 +111,8 @@ public class MovieFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            characterName = getArguments().getString(ARG_PARAM1);
+            currentPage=1;
         }
     }
 
@@ -132,18 +124,16 @@ public class MovieFragment extends BaseFragment {
         introLayout = (LinearLayout) fragmentView.findViewById(R.id.introLayout);
         movieDetailsLayout = (LinearLayout) fragmentView.findViewById(R.id.movieDetailsLayout);
         movieHeaderImage = (ImageView) fragmentView.findViewById(R.id.movieHeaderImage);
-        step1Layout = (RelativeLayout) fragmentView.findViewById(R.id.step1Layout);
-        step2Layout = (RelativeLayout) fragmentView.findViewById(R.id.step2Layout);
-        step1Layout.setOnClickListener(onClickListener);
-        step2Layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onFragmentInteraction(1);
-            }
-        });
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) fragmentView.findViewById(R.id.toolbar_layout);
+        toolbarLayout.setTitle(characterName+" Movies");
         View fabRandomMovie = fragmentView.findViewById(R.id.fabRandomMovie);
         fabRandomMovie.setOnClickListener(onClickListener);
-
+        introLayout.setVisibility(View.GONE);
+        movieDetailsLayout.setVisibility(View.VISIBLE);
+        cachedMovieList.clear();
+        snackbar = Snackbar.make(fragmentView, "Finding a "+characterName+" movie for you...", Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction("Action", null).show();
+        new GetCharacterSpecificMovie().execute(characterName);
         return fragmentView;
     }
 
@@ -178,7 +168,7 @@ public class MovieFragment extends BaseFragment {
         void onFragmentInteraction(int action);
     }
 
-    class GetRandomMovie extends AsyncTask<String,Long,AsyncTaskResult<List<Movie>>> {
+    class GetCharacterSpecificMovie extends AsyncTask<String,Long,AsyncTaskResult<List<Movie>>> {
 
         @Override
         protected AsyncTaskResult<List<Movie>> doInBackground(String... params) {
@@ -190,13 +180,17 @@ public class MovieFragment extends BaseFragment {
                 TmdbInterface apiService =
                         TmdbApiClient.getClient().create(TmdbInterface.class);
 
-                Call<MoviesResponse> call = apiService.getMarvelComicMovies(Constants.TMDB_API_KEY,currentPage);
+                Call<MoviesResponse> call = apiService.searchMovies(Constants.TMDB_API_KEY,params[0],"en",currentPage,true);
                 try {
                     Response<MoviesResponse> response = call.execute();
-                    Log.d("MovieAPI", "Response returned: " + response.isSuccessful());
-                    cachedMovieList.addAll(response.body().getResults());
-                    totalPages = response.body().getTotalPages();
-                    currentPage++;
+                    Log.d("SearchMovieAPI", "Response returned: " + response.isSuccessful());
+                    if(response.isSuccessful()) {
+                        cachedMovieList.addAll(response.body().getResults());
+                        totalPages = response.body().getTotalPages();
+                        currentPage++;
+                    } else {
+                        Log.d("SearchMovieAPI", "Response error message returned: " + response.message());
+                    }
                 } catch (IOException e) {
                     return new AsyncTaskResult<>(e);
                 }
@@ -221,7 +215,7 @@ public class MovieFragment extends BaseFragment {
                 movies = asyncTaskResult.getResult();
                 if(movies==null || movies.size()==0){
                     snackbar.dismiss();
-                    snackbar = Snackbar.make(getView(), "No movies found... ", Snackbar.LENGTH_INDEFINITE);
+                    snackbar = Snackbar.make(getView(), "No movies found for:"+characterName, Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction("Action", null).show();
                 } else {
                     Log.d("MovieAPI","Number of movies: "+movies.size());

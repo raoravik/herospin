@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.visa.r4r.poc.herospin.R;
-import com.visa.r4r.poc.herospin.fragment.CharacterFragment.OnListFragmentInteractionListener;
+import com.visa.r4r.poc.herospin.fragment.CharacterListFragment.OnListFragmentInteractionListener;
 import com.visa.r4r.poc.herospin.marvel.model.Character;
 import com.visa.r4r.poc.herospin.marvel.model.MarvelImage;
 
@@ -58,7 +58,7 @@ public class CharacterRecyclerViewAdapter extends RecyclerView.Adapter<Character
         Character character = mValues.get(position);
         holder.mItem = character;
         holder.nameTextView.setText(character.getName());
-        Picasso.with(holder.itemView.getContext()).load(character.getThumbnail().getImageUrl(MarvelImage.Size.LANDSCAPE_INCREDIBLE))
+        Picasso.with(holder.itemView.getContext()).load(character.getThumbnail().getImageUrl(MarvelImage.Size.STANDARD_FANTASTIC))
                 .fit().centerCrop().into(holder.photoImageView);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

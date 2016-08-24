@@ -14,15 +14,30 @@
  * limitations under the License.
  */
 
-package com.visa.r4r.poc.herospin.marvel.utils;
+package com.visa.r4r.poc.herospin.utils;
 
 /**
- * Created by ravrarao on 8/21/2016.
+ * Created by ravrarao on 8/22/2016.
  */
-public class Constants {
-    public static final String MARVEL_PUBLIC_KEY="08ec74eca88c726b7bb2c922d7b4044f";
-    public static final String MARVEL_PRIVATE_KEY="536d4e2efe393425de3f4512496d5a5d3d0c3a12";
+public class AsyncTaskResult<T> {
+    private T result;
+    private Exception error;
 
-    public static final String TMDB_API_KEY = "c6f2f2d13073e634cdd05c911157d4d6";
-    public static final String TMDB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/w342/";
+    public T getResult() {
+        return result;
+    }
+
+    public Exception getError() {
+        return error;
+    }
+
+    public AsyncTaskResult(T result) {
+        super();
+        this.result = result;
+    }
+
+    public AsyncTaskResult(Exception error) {
+        super();
+        this.error = error;
+    }
 }

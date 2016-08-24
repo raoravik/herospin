@@ -20,6 +20,7 @@ import com.visa.r4r.poc.herospin.marvel.model.Character;
 import com.visa.r4r.poc.herospin.marvel.model.Characters;
 import com.visa.r4r.poc.herospin.marvel.model.CharactersQuery;
 import com.visa.r4r.poc.herospin.marvel.model.MarvelResponse;
+import com.visa.r4r.poc.herospin.marvel.model.OrderBy;
 
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public final class CharacterApiClient extends MarvelApiClient {
 
   public MarvelResponse<Characters> getAll(int offset, int limit) throws MarvelApiException {
     CharactersQuery query =
-        CharactersQuery.Builder.create().withOffset(offset).withLimit(limit).build();
+        CharactersQuery.Builder.create().withOrderBy(OrderBy.MODIFIED,false).withOffset(offset).withLimit(limit).build();
     return getAll(query);
   }
 

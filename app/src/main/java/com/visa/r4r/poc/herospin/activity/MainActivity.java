@@ -16,26 +16,24 @@
 
 package com.visa.r4r.poc.herospin.activity;
 
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import com.ncapdevi.fragnav.FragNavController;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 import com.visa.r4r.poc.herospin.R;
 import com.visa.r4r.poc.herospin.fragment.BaseFragment;
-import com.visa.r4r.poc.herospin.fragment.CharacterFragment;
+import com.visa.r4r.poc.herospin.fragment.CharacterDetailsFragment;
+import com.visa.r4r.poc.herospin.fragment.CharacterListFragment;
+import com.visa.r4r.poc.herospin.fragment.CharacterMovieFragment;
 import com.visa.r4r.poc.herospin.fragment.MovieFragment;
 import com.visa.r4r.poc.herospin.marvel.model.Character;
 
@@ -43,8 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BaseFragment.FragmentNavigation
-        ,CharacterFragment.OnListFragmentInteractionListener
+        ,CharacterListFragment.OnListFragmentInteractionListener
+        ,CharacterDetailsFragment.OnFragmentInteractionListener
         ,MovieFragment.OnFragmentInteractionListener
+        ,CharacterMovieFragment.OnFragmentInteractionListener
 {
     private BottomBar bottomBar;
     private FragNavController fragNavController;
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     //Better convention to properly name the indices what they are in your app
     private final int INDEX_SURPRISE_ME = FragNavController.TAB1;
     private final int INDEX_SUPER_HEROES = FragNavController.TAB2;
-    private final int INDEX_SUPER_HEROES_1 = FragNavController.TAB3;
 
 
 
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         List<Fragment> fragments = new ArrayList<>(2);
 
         fragments.add(MovieFragment.newInstance("",""));
-        fragments.add(CharacterFragment.newInstance(0));
+        fragments.add(CharacterListFragment.newInstance(2));
         fragNavController =
                 new FragNavController(getSupportFragmentManager(), R.id.container, fragments);
 
@@ -151,31 +150,18 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
     @Override
     public void onListFragmentInteraction(Character character) {
-        Intent intent = new Intent(getApplicationContext(), CharacterDetailsActivity.class);
-        intent.putExtra("com.visa.r4r.poc.herospin.marvel.model.Character.id", character.getId());
-        intent.putExtra("com.visa.r4r.poc.herospin.marvel.model.Character.name", character.getName());
-//        startActivity(intent);
-
-        String transitionName = character.getId();
-
-        ImageView imageView = (ImageView)findViewById(R.id.iv_super_hero_photo);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            imageView.setTransitionName(transitionName);
-        }
-
-        intent.putExtra("transitionName", transitionName);
-
-        ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,
-                        imageView,   // The view which starts the transition
-                        transitionName    // The transitionName of the view we’re transitioning to
-                );
-        ActivityCompat.startActivity(MainActivity.this, intent, options.toBundle());
-
+        fragNavController.push(CharacterDetailsFragment.newInstance(character));
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onFragmentInteraction(int action) {
+        fragNavController.switchTab(action);
+    }
 
+    @Override
+    public void onFragmentInteraction(String characterName) {
+        //Handle Character Details Fragment Action.
+        Log.d("CHARACTERMOVIE","Loading character specific movie screen");
+        fragNavController.push(CharacterMovieFragment.newInstance(characterName));
     }
 }
